@@ -68,8 +68,9 @@ let moveRight = ([t, l]) => [t, l + 1];
 let moveLeft = ([t, l]) => [t, l - 1];
 let moveUp = ([t, l]) => [t - 1, l ];
 let moveDown = ([t, l]) => [t + 1, l ];
+
 let currentDirection = moveRight;
-let flushedDirection = currentDirection;
+let directionQueue = [];
 
 window.addEventListener('keydown', (e) => {
     // console.log(e.key)
@@ -77,30 +78,22 @@ window.addEventListener('keydown', (e) => {
         case "ArrowLeft":
         case 'A':
         case 'a':  
-            if (flushedDirection !== moveRight) {
-                currentDirection = moveLeft;
-            }
+            directionQueue.push(moveLeft)
             break;
         case "ArrowRight":
         case 'D':
         case 'd':
-            if (flushedDirection !== moveLeft) {
-                currentDirection = moveRight;
-            }
+            directionQueue.push(moveRight)
             break;
         case "ArrowUp":
         case 'W':
         case 'w':
-            if (flushedDirection !== moveDown) {
-                currentDirection = moveUp;
-            }
+            directionQueue.push(moveUp)
             break;
         case "ArrowDown":
         case 'S':
         case 's':
-            if (flushedDirection !== moveUp) {
-                currentDirection = moveDown;
-            }
+            directionQueue.push(moveDown)
             break;
     }
 })
@@ -108,10 +101,35 @@ window.addEventListener('keydown', (e) => {
 function step() {
     currentSnake.shift();
     let head = currentSnake[currentSnake.length - 1];
+    let nextDirection = currentDirection;
+    while (directionQueue.length > 0) {
+        let candidateDirection = directionQueue.shift();
+        if (areOpoosite(candidateDirection, currentDirection)) {
+            continue;
+        }
+        nextDirection = candidateDirection;
+    }
+
+    currentDirection = nextDirection;
     let nextHead = currentDirection(head);
     currentSnake.push(nextHead);
-    flushedDirection = currentDirection;
     drawSnake(currentSnake);
+}
+
+function areOpoosite(dir1, dir2) {
+    if (dir1 === moveLeft && dir2 === moveRight) {
+        return true;
+    }
+    if (dir1 === moveRight && dir2 === moveLeft) {
+        return true;
+    }
+    if (dir1 === moveUp && dir2 === moveDown) {
+        return true;
+    }
+    if (dir1 === moveDown && dir2 === moveUp) {
+        return true;
+    }
+    return false;
 }
 
 drawSnake(currentSnake);

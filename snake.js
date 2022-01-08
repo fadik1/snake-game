@@ -154,7 +154,7 @@ let gameInterval = setInterval(() => {
     step();
 }, 100);
 
-function toKey ([left, top]) {
+function toKey ([top, left]) {
     return top + '_' + left;
 }
 

@@ -62,6 +62,10 @@ let directionQueue;
 
 window.addEventListener('keydown', (e) => {
     // console.log(e.key)
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+        return;
+    }
+    e.preventDefault();
     switch (e.key) {
         case "ArrowLeft":
         case 'A':
@@ -108,6 +112,7 @@ function step() {
         return;
     }
     currentSnake.push(nextHead);
+    updatKeySets();
     if (toKey(nextHead) == currentFoodKey) {
         let nextFoodKey = spawnFood();
         if (nextFoodKey === null) {

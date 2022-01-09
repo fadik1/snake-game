@@ -9,6 +9,8 @@ let moveLeft = ([t, l]) => [t, l - 1];
 let moveUp = ([t, l]) => [t - 1, l ];
 let moveDown = ([t, l]) => [t + 1, l ];
 
+//--- rendering ---//
+
 function initializeCanvas() {
     for (let i = 0; i < ROWS; i++) {
         for (let j = 0; j < COLS; j++) {
@@ -53,6 +55,8 @@ function drawCanvas() {
     // })
 }
 
+//--- game state ---//
+
 let currentSnake;
 let currentSnakeKeys;
 let currentVacantKeys;
@@ -60,40 +64,7 @@ let currentFoodKey;
 let currentDirection;
 let directionQueue;
 
-window.addEventListener('keydown', (e) => {
-    // console.log(e.key)
-    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
-        return;
-    }
-    e.preventDefault();
-    switch (e.key) {
-        case "ArrowLeft":
-        case 'A':
-        case 'a':  
-            directionQueue.push(moveLeft)
-            break;
-        case "ArrowRight":
-        case 'D':
-        case 'd':
-            directionQueue.push(moveRight)
-            break;
-        case "ArrowUp":
-        case 'W':
-        case 'w':
-            directionQueue.push(moveUp)
-            break;
-        case "ArrowDown":
-        case 'S':
-        case 's':
-            directionQueue.push(moveDown)
-            break;
-        case 'r':
-        case 'R':
-            stopGame(false);
-            startGame();
-            break;
-    }
-})
+
 
 function step() {
     let head = currentSnake[currentSnake.length - 1];
@@ -155,6 +126,76 @@ function spawnFood() {
     throw Error('should never get here!');
 }
 
+//--- interaction---//
+
+function stopGame(success) {
+    canvas.style.borderColor = success ? 'green': 'red';
+    clearInterval(gameInterval);
+
+}
+
+window.addEventListener('keydown', (e) => {
+    // console.log(e.key)
+    if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+        return;
+    }
+    e.preventDefault();
+    switch (e.key) {
+        case "ArrowLeft":
+        case 'A':
+        case 'a':  
+            directionQueue.push(moveLeft)
+            break;
+        case "ArrowRight":
+        case 'D':
+        case 'd':
+            directionQueue.push(moveRight)
+            break;
+        case "ArrowUp":
+        case 'W':
+        case 'w':
+            directionQueue.push(moveUp)
+            break;
+        case "ArrowDown":
+        case 'S':
+        case 's':
+            directionQueue.push(moveDown)
+            break;
+        case 'r':
+        case 'R':
+            stopGame(false);
+            startGame();
+            break;
+    }
+})
+
+function startGame() {
+    directionQueue = [];
+    currentDirection = moveRight;
+    currentSnake = makeInitialSnake();
+    currentSnakeKeys = new Set();
+    currentVacantKeys = new Set();
+    for (let i = 0; i < ROWS; i++) {
+        for (let j = 0; j < COLS; j++) {
+            currentVacantKeys.add(toKey([i, j]));
+        }
+    }
+    for (let cell of currentSnake) {
+        let key = toKey(cell);
+        currentVacantKeys.delete(key);
+        currentSnakeKeys.add(key);
+    }
+    currentFoodKey = spawnFood();
+
+    canvas.style.borderColor = '';
+    gameInterval = setInterval(step, 30);
+    drawCanvas();
+}
+
+startGame();
+
+//--- utilities ---//
+
 function areOpoosite(dir1, dir2) {
     if (dir1 === moveLeft && dir2 === moveRight) {
         return true;
@@ -185,37 +226,6 @@ function checkValidHead(keys, cell) {
     return true;
 }
 
-function stopGame(success) {
-    canvas.style.borderColor = success ? 'green': 'red';
-    clearInterval(gameInterval);
-
-}
-
-function startGame() {
-    directionQueue = [];
-    currentDirection = moveRight;
-    currentSnake = makeInitialSnake();
-    currentSnakeKeys = new Set();
-    currentVacantKeys = new Set();
-    for (let i = 0; i < ROWS; i++) {
-        for (let j = 0; j < COLS; j++) {
-            currentVacantKeys.add(toKey([i, j]));
-        }
-    }
-    for (let cell of currentSnake) {
-        let key = toKey(cell);
-        currentVacantKeys.delete(key);
-        currentSnakeKeys.add(key);
-    }
-    currentFoodKey = spawnFood();
-
-    canvas.style.borderColor = '';
-    gameInterval = setInterval(step, 30);
-    drawCanvas();
-}
-
-startGame();
-
 function makeInitialSnake() {
     return  [
     [0,0], 
@@ -230,7 +240,6 @@ function makeInitialSnake() {
 function toKey ([top, left]) {
     return top + '_' + left;
 }
-
 function dump(obj) {
     document.getElementById('debug').innerText = 
     JSON.stringify(obj, null, 2)

@@ -44,6 +44,13 @@ function drawCanvas() {
             pixel.style.background = background;
         }
     }
+    dump({
+        currentSnake,
+        foodKey: currentFoodKey,
+        snakeKeys: Array.from(currentSnakeKeys),
+        vacantKeys: Array.from(currentVacantKeys),
+        
+    })
 }
 
 let currentSnake;
@@ -215,7 +222,8 @@ function toKey ([top, left]) {
 
 function dump(obj) {
     document.getElementById('debug').innerText = 
-    JSON.stringify(obj)
+    JSON.stringify(obj, null, 2)
+    console.log(obj)
 }
 
 

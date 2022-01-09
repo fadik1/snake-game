@@ -129,58 +129,6 @@ function spawnFood() {
     throw Error('should never get here!');
 }
 
-function checkIntegrity_SLOW() {
-    let failedCheck = null;
-    let foodCount = 0;
-    let allKeys = new Set();
-    for (let i = 0; i < ROWS; i++) {
-        for (let j = 0; j < COLS; j++) {
-            let key = toKey([i,j]);
-            allKeys.add(key);
-            if (key === currentFoodKey){
-                foodCount++;
-            }
-        }
-    }
-    if (foodCount !== 1) {
-        failedCheck = 'there cannot be two foods';
-    } 
-    let [snakeKeys, vacantKeys] = partitionCells(currentSnake);
-    if (!areSameSets_SLOW(snakeKeys, currentSnakeKeys)) {
-        failedCheck = 'snake keys do not match'
-    }
-    if (!areSameSets_SLOW(vacantKeys, currentVacantKeys)) {
-        failedCheck = 'vacant keys do not match'
-    }
-    if (currentSnakeKeys.has(currentFoodKey)) {
-        failedCheck = 'there is food on the snake'
-    }
-
-    if (currentSnake.length !== currentSnakeKeys.size) {
-        failedCheck = 'the snake itersects itself'
-    }
-    if (!areSameSets_SLOW(new Set([...currentSnakeKeys, ...currentVacantKeys]), allKeys)) {
-        failedCheck = 'something is out of bounds'
-    }
-    for (let i = 1/*intentional*/ ; i< currentSnake.length; i++) {
-        let cell = currentSnake[i];
-        let prevCell = currentSnake[i -1]
-        let dy = cell[0] - prevCell[0]
-        let dx = cell[1] - prevCell[1]
-        let isOk = 
-            (dy === 0 && Math.abs(dx) === 1) ||
-            (dx === 0 && Math.abs(dy) === 1) 
-        if (!isOk) {
-            failedCheck = 'the snake has a break'
-        }
-    }
-    if (failedCheck !== null) {
-        canvas.style.borderColor = 'purple';
-        clearInterval(gameInterval);
-        throw Error(failedCheck);
-    }
-}
-
 //--- interaction---//
 
 window.addEventListener('keydown', (e) => {
@@ -253,13 +201,6 @@ startGame();
 
 //--- utilities ---//
 
-function areSameSets_SLOW(a, b) {
-    return (
-        JSON.stringify([...a].sort()) ===
-        JSON.stringify([...b].sort()) 
-    );
-}
-
 function areOpoosite(dir1, dir2) {
     if (dir1 === moveLeft && dir2 === moveRight) {
         return true;
@@ -320,6 +261,68 @@ function makeInitialSnake() {
 function toKey ([top, left]) {
     return top + '_' + left;
 }
+
+// --- debugging ---//
+
+function checkIntegrity_SLOW() {
+    let failedCheck = null;
+    let foodCount = 0;
+    let allKeys = new Set();
+    for (let i = 0; i < ROWS; i++) {
+        for (let j = 0; j < COLS; j++) {
+            let key = toKey([i,j]);
+            allKeys.add(key);
+            if (key === currentFoodKey){
+                foodCount++;
+            }
+        }
+    }
+    if (foodCount !== 1) {
+        failedCheck = 'there cannot be two foods';
+    } 
+    let [snakeKeys, vacantKeys] = partitionCells(currentSnake);
+    if (!areSameSets_SLOW(snakeKeys, currentSnakeKeys)) {
+        failedCheck = 'snake keys do not match'
+    }
+    if (!areSameSets_SLOW(vacantKeys, currentVacantKeys)) {
+        failedCheck = 'vacant keys do not match'
+    }
+    if (currentSnakeKeys.has(currentFoodKey)) {
+        failedCheck = 'there is food on the snake'
+    }
+
+    if (currentSnake.length !== currentSnakeKeys.size) {
+        failedCheck = 'the snake itersects itself'
+    }
+    if (!areSameSets_SLOW(new Set([...currentSnakeKeys, ...currentVacantKeys]), allKeys)) {
+        failedCheck = 'something is out of bounds'
+    }
+    for (let i = 1/*intentional*/ ; i< currentSnake.length; i++) {
+        let cell = currentSnake[i];
+        let prevCell = currentSnake[i -1]
+        let dy = cell[0] - prevCell[0]
+        let dx = cell[1] - prevCell[1]
+        let isOk = 
+            (dy === 0 && Math.abs(dx) === 1) ||
+            (dx === 0 && Math.abs(dy) === 1) 
+        if (!isOk) {
+            failedCheck = 'the snake has a break'
+        }
+    }
+    if (failedCheck !== null) {
+        stopGame(false);
+        canvas.style.borderColor = 'purple';
+        throw Error(failedCheck);
+    }
+}
+
+function areSameSets_SLOW(a, b) {
+    return (
+        JSON.stringify([...a].sort()) ===
+        JSON.stringify([...b].sort()) 
+    );
+}
+
 function dump(obj) {
     document.getElementById('debug').innerText = 
     JSON.stringify(obj, null, 2)

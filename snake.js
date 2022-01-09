@@ -44,13 +44,13 @@ function drawCanvas() {
             pixel.style.background = background;
         }
     }
-    dump({
-        currentSnake,
-        foodKey: currentFoodKey,
-        snakeKeys: Array.from(currentSnakeKeys),
-        vacantKeys: Array.from(currentVacantKeys),
+    // dump({
+    //     currentSnake,
+    //     foodKey: currentFoodKey,
+    //     snakeKeys: Array.from(currentSnakeKeys),
+    //     vacantKeys: Array.from(currentVacantKeys),
         
-    })
+    // })
 }
 
 let currentSnake;
@@ -111,8 +111,7 @@ function step() {
         stopGame(false);
         return;
     }
-    currentSnake.push(nextHead);
-    updatKeySets();
+    pushHead(nextHead);
     if (toKey(nextHead) == currentFoodKey) {
         let nextFoodKey = spawnFood();
         if (nextFoodKey === null) {
@@ -122,25 +121,23 @@ function step() {
         currentFoodKey = nextFoodKey;
     } 
     else {  
-        currentSnake.shift();
+        popTail();
     }
-    updatKeySets();
     drawCanvas();
 }
 
-function updatKeySets() {
-    currentSnakeKeys = new Set();
-    currentVacantKeys = new Set();
-    for (let i = 0; i < ROWS; i++) {
-        for (let j = 0; j < COLS; j++) {
-            currentVacantKeys.add(toKey([i, j]));
-        }
-    }
-    for (let cell of currentSnake) {
-        let key = toKey(cell);
-        currentVacantKeys.delete(key);
-        currentSnakeKeys.add(key);
-    }
+function pushHead(nextHead) {
+    currentSnake.push(nextHead);
+    let key = toKey(nextHead);
+    currentVacantKeys.delete(key);
+    currentSnakeKeys.add(key);
+}
+
+function popTail() {
+    let tail = currentSnake.shift();
+    let key = toKey(tail);
+    currentVacantKeys.add(key);
+    currentSnakeKeys.delete(key);
 }
 
 function spawnFood() {
@@ -200,7 +197,16 @@ function startGame() {
     currentSnake = makeInitialSnake();
     currentSnakeKeys = new Set();
     currentVacantKeys = new Set();
-    updatKeySets();
+    for (let i = 0; i < ROWS; i++) {
+        for (let j = 0; j < COLS; j++) {
+            currentVacantKeys.add(toKey([i, j]));
+        }
+    }
+    for (let cell of currentSnake) {
+        let key = toKey(cell);
+        currentVacantKeys.delete(key);
+        currentSnakeKeys.add(key);
+    }
     currentFoodKey = spawnFood();
 
     canvas.style.borderColor = '';

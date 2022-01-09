@@ -1,5 +1,46 @@
-<div id="canvas"></div>
-<pre id="debug"></pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+            <!--Type .navbar__container to create div with class-->
+            <div class="navbar__container">
+                <a href="" id="navbar__logo"><i class="fas fa-bolt"></i>Snake</a>
+                <p id="snake__score"> Score </p>
+                <ul class="navbar__menu">
+                    <li class="navbar__item">
+                        <a href="" class="navbar__links"> Difficulty </a>
+                    </li>
+                    <li class="navbar__item">
+                        <a href="" class="navbar__links"> Size </a>
+                    </li>
+                    <li class="navbar__btn">
+                        <a href="" class="button"> About </a>
+                    </li>
+                </ul>
+            </div>
+    </nav>
+
+    <div class="main">
+        <div class="main__container">
+            <div id="canvas"></div>
+        </div>
+    </div>
+    <pre id="debug"></pre>
+
+    <script src="snake.js"></script>  
+
+</body>
+</html>
+
+
+<!-- <div id="canvas"></div>
 <style>
     #canvas{
         width: 500px;
@@ -13,9 +54,6 @@
         box-sizing: border-box;
     }
 
-#debug {
-    color: red;
-    font-size: 10px;
-}
+
 </style>
-<script src="snake.js"></script>
+<script src="snake.js"></script> -->

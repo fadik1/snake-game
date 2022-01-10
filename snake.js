@@ -63,6 +63,8 @@ let currentFoodKey;
 let currentDirection;
 let directionQueue;
 let currentScore;
+let difficulty;
+let canvasSize;
 
 function step() {
   let head = currentSnake[currentSnake.length - 1];
@@ -88,7 +90,7 @@ function step() {
       return;
     }
     currentFoodKey = nextFoodKey;
-    updateScore();
+    updateScore(true);
   } 
   else {
     popTail();
@@ -99,10 +101,19 @@ function step() {
   }
 }
 
-function updateScore() {
-  currentScore++;
-  scoreString = "Score: " + currentScore;
-  score.innerHTML = scoreString;
+function updateScore(success) {
+  if (success) {
+    currentScore++;
+    scoreString = "Score: " + currentScore;
+    score.innerHTML = scoreString;
+    return;
+  }
+  if (!success) {
+    scoreString = "Score: " + currentScore;
+    score.innerHTML = scoreString;
+    return;
+  }
+
 }
 
 function pushHead(nextHead) {
@@ -172,12 +183,21 @@ window.addEventListener("keydown", (e) => {
 });
 
 function stopGame(success) {
-  canvas.style.borderColor = success ? "green" : "red";
-  clearInterval(gameInterval);
+  if (typeof gameInterval !== 'undefined') {
+    canvas.style.borderColor = success ? "green" : "red";
+    clearInterval(gameInterval);
+  }
 }
 
 function startGame() {
+  difficulty = document.getElementById("difficulty-select").value;
+  if (difficulty == 'null') {
+    alert("Please select diffiuclty!");
+    return;
+  }
+
   currentScore = 0;
+  updateScore(false);
   directionQueue = [];
   currentDirection = moveRight;
   currentSnake = makeInitialSnake();
@@ -198,11 +218,9 @@ function startGame() {
   currentSnakeKeys = snakeKeys;
   currentVacantKeys = vacantKeys;
   canvas.style.borderColor = "";
-  gameInterval = setInterval(step, 30);
+  gameInterval = setInterval(step, difficulty);
   drawCanvas();
 }
-
-startGame();
 
 //--- utilities ---//
 

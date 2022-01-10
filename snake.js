@@ -1,4 +1,5 @@
 let canvas = document.getElementById("canvas");
+let score = document.getElementById('snake__score');
 
 let ROWS = 30;
 let COLS = 50;
@@ -61,6 +62,7 @@ let currentVacantKeys;
 let currentFoodKey;
 let currentDirection;
 let directionQueue;
+let currentScore;
 
 function step() {
   let head = currentSnake[currentSnake.length - 1];
@@ -86,13 +88,21 @@ function step() {
       return;
     }
     currentFoodKey = nextFoodKey;
-  } else {
+    updateScore();
+  } 
+  else {
     popTail();
   }
   drawCanvas();
   if (window.location.search === "?debug") {
     checkIntegrity_SLOW();
   }
+}
+
+function updateScore() {
+  currentScore++;
+  scoreString = "Score: " + currentScore;
+  score.innerHTML = scoreString;
 }
 
 function pushHead(nextHead) {
@@ -167,6 +177,7 @@ function stopGame(success) {
 }
 
 function startGame() {
+  currentScore = 0;
   directionQueue = [];
   currentDirection = moveRight;
   currentSnake = makeInitialSnake();
